@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Para mi mejor amiga ✨</title>
+    <link href="https://fonts.googleapis.com" rel="stylesheet">
+    <style>
+        body { margin: 0; background: #0b0114; color: white; font-family: 'Quicksand', sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; text-align: center; transition: background 2s; }
+        
+        /* Fondo de Ciudad y Flores */
+        #ciudad { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, #020107 0%, #201b46 100%); z-index: -1; opacity: 0; transition: 3s; }
+        .flor { position: absolute; color: white; font-size: 1.5rem; user-select: none; z-index: 1; animation: caer linear infinite; }
+        @keyframes caer { to { transform: translateY(110vh) rotate(360deg); } }
+
+        /* Interfaz de la Carta */
+        .sobre-inicio { background: #fff; padding: 40px; border-radius: 10px; box-shadow: 0 0 50px rgba(255, 77, 121, 0.5); cursor: pointer; transition: 0.5s; z-index: 100; border: 3px solid #ff4d79; }
+        .sobre-inicio:hover { transform: scale(1.05); }
+        .sobre-inicio h2 { font-family: 'Dancing Script', cursive; color: #ff4d79; margin: 0; font-size: 2.5rem; }
+
+        /* Botón de la Broma */
+        .btn-loco { padding: 15px 35px; background: #ff007f; border: 3px solid white; border-radius: 50px; color: white; cursor: pointer; position: absolute; z-index: 9999; box-shadow: 0 0 25px #ff007f; font-weight: bold; font-size: 1.5rem; transition: 0.1s; display: none; }
+        
+        /* Textos y Cartas Finales */
+        #contenedor-texto { width: 85%; max-width: 750px; z-index: 10; display: none; }
+        .texto-nostalgico { font-family: 'Dancing Script', cursive; font-size: 2.2rem; color: #ffb7c5; line-height: 1.5; text-shadow: 2px 2px 15px rgba(0,0,0,1); }
+        .carta-final { background: #fff; color: #ff4d79; padding: 18px; border-radius: 15px; display: inline-block; margin: 10px; transform: scale(0); transition: 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 0 25px #ffd700; font-family: 'Dancing Script', cursive; font-size: 1.8rem; border: 3px solid #ffd700; }
+        .visible { transform: scale(1) !important; opacity: 1 !important; }
+        
+        #emoji-corriendo { font-size: 6rem; position: absolute; bottom: 12%; left: -200px; z-index: 5; transition: 2.5s linear; }
+    </style>
+</head>
+<body>
+
+    <div id="ciudad"></div>
+    
+    <!-- Inicio: La Carta -->
+    <div id="sobre" class="sobre-inicio" onclick="iniciar()">
+        <h2>Toca aquí Ysmar ✨</h2>
+        <p style="color: #ff85a2;">(Sube el volumen)</p>
+    </div>
+
+    <button id="btnBroma" class="btn-loco">¡TOCAME!</button>
+
+    <div id="contenedor-texto"></div>
+    <div id="emoji-corriendo">🏃‍♂️💨</div>
+
+    <script>
+        const sobre = document.getElementById('sobre');
+        const btnBroma = document.getElementById('btnBroma');
+        const contenedor = document.getElementById('contenedor-texto');
+        const ciudad = document.getElementById('ciudad');
+        const emoji = document.getElementById('emoji-corriendo');
+        let clics = 0;
+
+        // --- Audio Engine ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function sonar(freq, tipo, duracion, vol = 0.2) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = tipo; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duracion);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + duracion);
+        }
+
+        function risas() {
+            for(let i=0; i<15; i++) setTimeout(() => sonar(100 + Math.random()*500, 'sawtooth', 0.2, 0.08), i*70);
+        }
+
+        function musicaSuave() {
+            const notas = [523, 659, 783, 880];
+            notas.forEach((n, i) => setTimeout(() => sonar(n, 'sine', 3, 0.04), i*600));
+        }
+
+        function crearFlor() {
+            const f = document.createElement('div');
+            f.className = 'flor';
+            f.innerHTML = '🌸'; // Puedes cambiar por ❀ o ✿
+            f.style.left = Math.random() * 100 + 'vw';
+            f.style.animationDuration = Math.random() * 3 + 2 + 's';
+            f.style.opacity = Math.random();
+            document.body.appendChild(f);
+            setTimeout(() => f.remove(), 5000);
+        }
+
+        // --- Lógica del Flujo ---
+        function iniciar() {
+            sobre.style.display = 'none';
+            btnBroma.style.display = 'block';
+            btnBroma.style.top = '50%'; btnBroma.style.left = '50%';
+            btnBroma.style.transform = 'translate(-50%, -50%)';
+            sonar(600, 'sine', 0.5);
+        }
+
+        btnBroma.addEventListener('click', () => {
+            clics++;
+            sonar(200 + (clics * 80), 'sine', 0.2);
+            if (clics < 8) {
+                btnBroma.innerText = "¡CASI!";
+                btnBroma.style.top = (Math.random() * 60 + 20) + "%";
+                btnBroma.style.left = (Math.random() * 60 + 20) + "%";
+                btnBroma.style.transform = "none";
+            } else {
+                btnBroma.remove();
+                faseSusto();
+            }
+        });
+
+        function faseSusto() {
+            document.body.style.background = "red";
+            risas();
+            contenedor.style.display = 'block';
+            contenedor.innerHTML = "<h1 style='font-size:5rem; color:white;'>¡VOLVISTE A CAER! 😂🤡</h1>";
+            setTimeout(faseNostalgia, 3000);
+        }
+
+        function faseNostalgia() {
+            ciudad.style.opacity = 1;
+            document.body.style.background = "transparent";
+            setInterval(crearFlor, 300); // Empiezan a caer flores
+            setInterval(musicaSuave, 4000);
+            
+            contenedor.innerHTML = `<div id='txt' class='texto-nostalgico' style='opacity:0; transition:1s;'>
+                Han pasado 4 años desde ese primer hola, de nuestros dos esclavos solo nos quedamos con la tuya 😂💧<br><br>
+                Creo que debí esperar el 14 pero me da ladilla... Yo siempre 😅 pero bueh, has sido muchas cosas en mi vida y lo aprecio mucho, eres demasiado rara, digamos que linda pero siempre has estado cuando te necesito y...
+            </div>`;
+            setTimeout(() => document.getElementById('txt').style.opacity = 1, 500);
+            setTimeout(faseFinal, 11000);
+        }
+
+        function faseFinal() {
+            contenedor.innerHTML = `
+                <h2 class='texto-nostalgico' style='opacity:1'>Quien diria que me haz venido soportando 1,460 dias enfermita, yo se que no soy muy sentimental y te termino tratando del orto pero vos sabe que te quelo.</h2>
+                <div id='cartas'>
+                    <div class='carta-final' id='c1'>ERES</div>
+                    <div class='carta-final' id='c2'>LA MEJOR</div>
+                    <div class='carta-final' id='c3'>ENFERMITA</div>
+                </div>`;
+            setTimeout(() => { document.getElementById('c1').classList.add('visible'); sonar(523, 'sine', 0.5); }, 600);
+            setTimeout(() => { document.getElementById('c2').classList.add('visible'); sonar(659, 'sine', 0.5); }, 1200);
+            setTimeout(() => { document.getElementById('c3').classList.add('visible'); sonar(783, 'sine', 0.5); }, 1800);
+            setTimeout(remateArhanza, 8000);
+        }
+
+        function remateArhanza() {
+            ciudad.style.opacity = 0;
+            document.body.style.background = "#000";
+            contenedor.innerHTML = "<h1 class='texto-nostalgico' style='opacity:1'>¿Será que esto le guste a Arhanza? 😍🏃‍♂️</h1>";
+            
+            setTimeout(() => {
+                emoji.style.left = "120vw";
+                setTimeout(() => {
+                    sonar(80, 'square', 0.6);
+                    contenedor.innerHTML += "<h2 style='color:orange; margin-top:20px;'>¡PUM! *Se cae de cara* 🤡💨</h2><h3 style='color:gray; font-size:1.5rem'>Ando comiendo migajas nivel Dios...</h3>";
+                    risas();
+                }, 1300);
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
